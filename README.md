@@ -37,9 +37,9 @@ redis
 
 #执行
 在命令行执行：
-	script uri --method=get --xx=xx
-其中method为框架所需，配合http协议区分脚本的执行方式，默认为get
---开头的作为参数传入
+`script uri --method=get --xx=xx`
+>> 其中method为框架所需，配合http协议区分脚本的执行方式，默认为get
+>> --开头的作为参数传入
 
 #内部说明
 1.auto应用，包含基本的自动化脚本，内部通过task来划分脚本
