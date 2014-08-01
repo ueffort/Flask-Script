@@ -4,7 +4,10 @@
 """
 
 # 允许访问的APP
-ALLOW_APP = ['auto', 'test']
+ALLOW_APP = ['auto']
+
+# 测试的模块
+TEST_MODULE = ['test']
 
 # Email设定
 MAIL_SERVER = 'xx'

@@ -1,9 +1,11 @@
 #!evn/bin/python
 # -*- coding: utf-8 -*-
+import unittest
 from urllib import quote_plus
 import re
 from common.dispatcher import *
 from werkzeug.test import EnvironBuilder, run_wsgi_app
+from settings import TEST_MODULE
 
 __author__ = 'GaoJie'
 import argparse
@@ -16,6 +18,10 @@ if __name__ == '__main__':
 
 	options, arg = parser.parse_known_args()
 
+	if options.uri in TEST_MODULE:
+		argv = sys.argv[2:]
+		argv.insert(0, sys.argv[0])
+		unittest.main(module=options.uri, argv=argv)
 	application = PathDispatcher(create_app=create_app)
 
 	data_dict = {}

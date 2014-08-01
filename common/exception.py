@@ -15,7 +15,7 @@ class AppNotExist(BaseException):
 		if self.allow:
 			return 'App(%s) is allowed, but does not exist!' % self.app_name
 		else:
-			return 'App List: %s ' % ' , '.join(ALLOW_APP)
+			return 'App List: %s or Test: %s' % (' , '.join(ALLOW_APP), ' , '.join(TEST_MODULE))
 
 
 class BlueprintNotExist(BaseException):
