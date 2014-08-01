@@ -12,11 +12,12 @@ Flask-Script
 
 3.安装所需类库
 ### 安装脚本 ###
-* Linux下：`./install.sh` *
-* Windows下：`./install.bat` *
+* Linux下：`./install.sh`
+* Windows下：`./install.bat` 
+
 ### 手动安装：###
-* Linux下：`./env/bin/pip install xxx` *
-* Windows下：`./env/Scripts/pip install xxx` *
+* Linux下：`./env/bin/pip install xxx`
+* Windows下：`./env/Scripts/pip install xxx`
 
 4.环境所需安装类库
 flask
@@ -29,10 +30,10 @@ redis
 	#!evn/bin/python
 
 #配置
-* settings为通用配置，和执行环境无关的配置设置 *
-* 复制production_settings_template.py为production_settings.py，并修改对应的配置信息 * 
-* 需要保证local_settings.py和production_settings_template.py的配置项一致 * 
-* 以APP_name为开头的%s_CONFIG为应用的单独配置，可以用于划分数据库等，如果在settings中已经存在，则需要手动进行合并 * 
+* settings为通用配置，和执行环境无关的配置设置
+* 复制production_settings_template.py为production_settings.py，并修改对应的配置信息 
+* 需要保证local_settings.py和production_settings_template.py的配置项一致
+* 以APP_name为开头的%s_CONFIG为应用的单独配置，可以用于划分数据库等，如果在settings中已经存在，则需要手动进行合并
 
 #执行
 在命令行执行：
