@@ -53,3 +53,5 @@ Flask-Script
 ## test应用
 > 包含对其他应用的单元测试
 
+* 整合基本的unittest，uri参数为settings中设置的`TEST_MODULE`即可进入单元测试
+* 后续参数与unittest参数一致即可，如执行所有test: `discover`
