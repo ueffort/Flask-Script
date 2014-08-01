@@ -11,10 +11,10 @@ Flask-Script
 	virtualenv --system-site-packages env
 
 3.安装所需类库
-安装脚本
+### 安装脚本 ###
 * Linux下：`./install.sh` *
 * Windows下：`./install.bat` *
-手动安装：
+### 手动安装：###
 * Linux下：`./env/bin/pip install xxx` *
 * Windows下：`./env/Scripts/pip install xxx` *
 
