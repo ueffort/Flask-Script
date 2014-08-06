@@ -11,4 +11,4 @@ task = get_module_blueprint(task_blueprint, __name__)
 
 @task.route('/cache')
 def cache():
-	print 1
+    print 1

@@ -5,5 +5,5 @@ DEBUG = False
 
 # 设定AUTO的配置信息
 AUTO_CONFIG = {
-	'SQLALCHEMY_DATABASE_URI': 'mysql://user:password@server:port/dbname'
+    'SQLALCHEMY_DATABASE_URI': 'mysql://user:password@server:port/dbname'
 }
