@@ -3,14 +3,15 @@
 creative的脚本任务
 """
 from auto.decorators import action
+from auto.task import logger as parent_logger
 from common.decorators import responsed
-from common.framework import get_module_blueprint, get_current_logger
-from auto.task import blueprint_list
-from auto import app, logger as parent_logger
+from common.framework import get_module_blueprint
+from auto.task import task_blueprint
 
 __author__ = 'GaoJie'
-task = get_module_blueprint(blueprint_list, __name__)
-logger = get_current_logger(app, __name__)
+task = get_module_blueprint(task_blueprint, __name__)
+logger = parent_logger.getChild('creative')
+
 action_list = []
 
 

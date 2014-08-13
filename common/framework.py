@@ -33,7 +33,8 @@ def create_app(app_name):
     try:
         app_obj = __import__(app_name)
         app = getattr(app_obj, 'app')
-    except (AttributeError) as e:
+    except (ImportError, AttributeError) as e:
+        print e
         raise AppNotExist(app_name)
     return app
 
@@ -77,39 +78,30 @@ def init_app_logger(app):
     return True
 
 
-def get_module_package(path):
+def get_module_list(path):
     """
     获取路径下所有模块名
     """
     module_list = []
-    package_list = []
     files = os.listdir(path)
     for f in files:
-        mat = re.match(r'([^\.]*)(\.py)?$', f)
+        mat = re.match(r'(.*)\.py$', f)
         if mat and mat.group(1) != '__init__':
-            if not mat.group(2):
-                package_list.append(mat.group(1))
-            elif mat.group(2) == '.py':
-                module_list.append(mat.group(1))
-    return module_list, package_list
+            module_list.append(mat.group(1))
+    return module_list
 
 
-def blueprint_module(module_list, package_full, father_url=None, need_lazy=True):
+def blueprint_module(app, module_list, alias, need_lazy=True):
     """
     根据模块列表注册蓝图
     """
     blueprint_map = {}
-    if not father_url:
-        father_url = '/'
-    else:
-        father_url = '%s%s/' % (father_url, package_full.split('.')[-1])
     func = LazyBlueprint if need_lazy else Blueprint
     if module_list:
         for module_name in module_list:
-            blueprint_map[module_name] = func('%s.%s' % (package_full, module_name),
-                                              '%s.%s' % (package_full, module_name),
-                                              url_prefix='%s%s' % (father_url, module_name))
-    return blueprint_map, father_url
+            blueprint_map[module_name] = func('%s.%s' % (alias, module_name), '%s.%s.%s' % (app.import_name,
+                                                                                            alias, module_name), url_prefix='/%s' % module_name)
+    return blueprint_map
 
 
 def get_module_blueprint(blueprint_map, module_name):
@@ -123,10 +115,6 @@ def get_module_blueprint(blueprint_map, module_name):
     if module_name not in blueprint_map:
         raise BlueprintNotExist(module_name)
     return blueprint_map[module_name]
-
-
-def get_current_logger(app, module_full):
-    return app.logger.getChild(module_full[len(app.import_name) + 1:])
 
 
 class LazyView(object):

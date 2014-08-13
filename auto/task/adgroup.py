@@ -2,18 +2,13 @@
 """
 adgroup的脚本任务
 """
-from auto.decorators import action
-from common.decorators import responsed
 from common.framework import get_module_blueprint
-from auto.task import blueprint_list
+from auto.task import task_blueprint
 
 __author__ = 'GaoJie'
-instance = get_module_blueprint(blueprint_list, __name__)
-action_list = []
+task = get_module_blueprint(task_blueprint, __name__)
 
 
-@action(action_list)
-@instance.route('/cache')
-@responsed
+@task.route('/cache')
 def cache():
     print 1
