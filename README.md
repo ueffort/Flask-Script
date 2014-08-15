@@ -8,7 +8,7 @@ Flask-Script
 >>`pip install virtualenv`
 
 2.在源码目录中执行
->>`virtualenv --system-site-packages env`
+>>`virtualenv --system-site-packages --python=python2.7 env`
 
 3.安装所需类库
 ### 安装脚本 ###

@@ -6,7 +6,7 @@ from auto import app
 from auto.decorators import action
 from common.decorators import responsed
 from common.framework import get_module_blueprint, get_current_logger
-from auto.task.materiel import blueprint_list
+from auto.task.material import blueprint_list
 
 __author__ = 'GaoJie'
 instance = get_module_blueprint(blueprint_list, __name__)

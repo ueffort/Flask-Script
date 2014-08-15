@@ -1,4 +1,4 @@
-#!evn/bin/python
+#!env/bin/python
 # -*- coding: utf-8 -*-
 import unittest
 from urllib import quote_plus

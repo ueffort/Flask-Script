@@ -1,4 +1,4 @@
-#!evn/bin/python
+#!env/bin/python
 # -*- coding: utf-8 -*-
 
 from auto import app as default_app
