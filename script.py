@@ -3,21 +3,26 @@
 import unittest
 from urllib import quote_plus
 import re
-from common.dispatcher import *
+import argparse
 from werkzeug.test import EnvironBuilder, run_wsgi_app
 from settings import TEST_MODULE
+from common.dispatcher import *
+from common.framework import *
+
 
 __author__ = 'GaoJie'
-import argparse
-from common.framework import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Structured call execute scripts, parameters with an optional way to add")
     parser.add_argument("uri", type=str, help="See ReadMe")
     parser.add_argument("--method", type=str, choices=("get", "post", "delete"), default='get', help="Http Method")
+    parser.add_argument("-d", action='store_true', default=False, help="Open Debug")
 
     options, arg = parser.parse_known_args()
 
+    #是否开启DEBUG模式，会忽略配置中的DEBUG，用于线上调试
+    if options.d:
+        open_debug(True)
     # 单元测试
     if options.uri in TEST_MODULE:
         argv = sys.argv[2:]

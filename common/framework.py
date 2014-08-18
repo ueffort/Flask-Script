@@ -14,6 +14,12 @@ from werkzeug.utils import cached_property, import_string
 
 __author__ = 'GaoJie'
 config = FlaskConfig(get_root_path(__name__))
+DEBUG = False
+
+
+def open_debug(b):
+    global DEBUG
+    DEBUG = b
 
 
 def create_app(app_name):
@@ -43,6 +49,8 @@ def init_app_config(app):
     初始化应用配置：对配置信息进行应用划分
     """
     app.config.from_object(config.last_obj)
+    if DEBUG:
+        app.debug = DEBUG
     config_name = '%s_CONFIG' % app.import_name.upper()
     if config_name not in app.config:
         return False
@@ -51,6 +59,8 @@ def init_app_config(app):
         return False
     for key, value in app_config.items():
         app.config[key] = value
+    if DEBUG:
+        app.debug = DEBUG
     return True
 
 
@@ -60,19 +70,25 @@ def init_app_logger(app):
     """
     #todo 通过logging的配置文件加载logging，并进行绑定，根据命令行参数切换
     logger = app.logger
+    del logger.handlers[:]
     if 'LOGGING_HANDLER' in app.config:
-        del logger.handlers[:]
-        handler_class = __import__(app.config['LOGGING_HANDLER'])
-        arg = app.config['LOGGING_HANDLER_ARG'] if 'LOGGING_HANDLER_ARG' in app.config else {}
-        handler = handler_class(*arg)
+        logging_handler = app.config['LOGGING_HANDLER']
     else:
-        handler = logger.handlers[0]
+        logging_handler = 'logging.StreamHandler'
+    logging_handler = logging_handler.split('.')
+    module = __import__('.'.join(logging_handler[:-1]))
+    handler_class = getattr(module, ''.join(logging_handler[-1]))
+    arg = app.config['LOGGING_HANDLER_ARG'] if 'LOGGING_HANDLER_ARG' in app.config else {}
+    handler = handler_class(*arg)
     log_level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else logging.INFO
     if type(log_level) is str:
         log_level = logging.getLevelName(log_level)
-    logger.setLevel(logging.DEBUG if app.debug and log_level < logging.DEBUG else log_level)
+    level = logging.DEBUG if app.debug and log_level >= logging.DEBUG else log_level
+    logger.setLevel(level)
     log_format = app.config['LOGGING_FORMAT'] if 'LOGGING_FORMAT' in app.config else app.debug_log_format
     handler.setFormatter(logging.Formatter(log_format))
+
+    handler.setLevel(level)
     logger.addHandler(handler)
     return True
 
