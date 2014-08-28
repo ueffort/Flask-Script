@@ -26,14 +26,7 @@ def create_app(app_name):
     """
     根据AppName来加载app，设定配置信息，初始化app信息
     """
-    global config
-    # 导入生产环境配置
-    try:
-        config.from_pyfile('../production_settings.py')
-    except IOError as e:
-        #导入本地配置
-        config.from_pyfile('../local_settings.py')
-
+    init_config()
     if app_name not in ALLOW_APP:
         raise AppNotExist(app_name, allow=False)
     try:
@@ -42,6 +35,16 @@ def create_app(app_name):
     except (AttributeError) as e:
         raise AppNotExist(app_name)
     return app
+
+
+def init_config():
+    global config
+    # 导入生产环境配置
+    try:
+        config.from_pyfile('../production_settings.py')
+    except IOError as e:
+        # 导入本地配置
+        config.from_pyfile('../local_settings.py')
 
 
 def init_app_config(app):
