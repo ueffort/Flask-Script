@@ -14,7 +14,7 @@ MAIL_SERVER = 'xx'
 MAIL_PORT = 25
 MAIL_USERNAME = ''
 MAIL_PASSWORD = ''
-DEFAULT_MAIL_SENDER = 'xx<xx@xx.com>'
+MAIL_DEFAULT_SENDER = 'xx<xx@xx.com>'
 
 # 日志定义
 LOGGING_FORMAT = '%(asctime)s [%(levelname)s] [%(name)s:%(lineno)s] [%(funcName)s] : %(message)s'
