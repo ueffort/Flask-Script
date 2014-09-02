@@ -26,7 +26,6 @@ def create_app(app_name):
     """
     根据AppName来加载app，设定配置信息，初始化app信息
     """
-    init_config()
     if app_name not in ALLOW_APP:
         raise AppNotExist(app_name, allow=False)
     try:
@@ -37,8 +36,24 @@ def create_app(app_name):
     return app
 
 
+def enter_app_context(app_name):
+    """
+        根据AppName来加载app，设定配置信息，初始化app信息,返回一个app环境
+        """
+    if app_name not in ALLOW_APP:
+        raise AppNotExist(app_name, allow=False)
+    try:
+        app_obj = __import__(app_name)
+        app = getattr(app_obj, 'app')
+    except (AttributeError) as e:
+        raise AppNotExist(app_name)
+    return app.app_context()
+
+
 def init_config():
     global config
+    if config.last_obj:
+        return
     # 导入生产环境配置
     try:
         config.from_pyfile('../production_settings.py')
@@ -51,6 +66,7 @@ def init_app_config(app):
     """
     初始化应用配置：对配置信息进行应用划分
     """
+    init_config()
     app.config.from_object(config.last_obj)
     if DEBUG:
         app.debug = DEBUG
