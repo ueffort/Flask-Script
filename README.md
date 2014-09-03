@@ -55,4 +55,4 @@ Flask-Script
 
 * 整合基本的`unittest`，`uri`参数为`settings`中设置的`TEST_MODULE`即可进入单元测试
 * 后续参数与`unittest`参数一致即可，如执行所有test: `discover`
-* 每个测试脚本只能访问一个app环境，加载对应的环境module
+* 一个应用建立一个test单元，在`__init__`中添加应用context，让测试进入app的环境
