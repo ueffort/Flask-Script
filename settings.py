@@ -7,7 +7,7 @@
 ALLOW_APP = ['auto']
 
 # 测试的模块
-TEST_MODULE = ['test']
+TEST_MODULE = ['auto_test']
 
 # Email设定
 MAIL_SERVER = 'xx'
