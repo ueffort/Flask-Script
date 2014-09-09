@@ -7,12 +7,12 @@ import urllib2
 __author__ = 'GaoJie'
 
 
-def send_email(title, content, to_list, cc_list=None, sender=None):
+def send_email(title, content, to_list, cc_list=None, bcc_list=None, sender=None):
     """
     发送邮件
     """
     mail = Mail(current_app)
-    msg = Message(subject=title, html=content, recipients=to_list, sender=sender, cc=cc_list)
+    msg = Message(subject=title, html=content, recipients=to_list, sender=sender, cc=cc_list, bcc=bcc_list)
     mail.send(msg)
 
 
