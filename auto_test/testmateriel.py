@@ -2,7 +2,7 @@
 import os
 import tempfile
 import unittest
-from test.auto import *
+from auto.test_enter import *
 from core.model.bunny import *
 from common.tools import send_email
 
