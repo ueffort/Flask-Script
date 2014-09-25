@@ -103,7 +103,7 @@ def init_app_logger(app):
     if type(log_level) is str:
         log_level = logging.getLevelName(log_level)
     level = logging.DEBUG if app.debug and log_level >= logging.DEBUG else log_level
-    logger.setLevel(level)
+    logger.setLevel(logging.DEBUG)
     log_format = app.config['LOGGING_FORMAT'] if 'LOGGING_FORMAT' in app.config else app.debug_log_format
     handler.setFormatter(logging.Formatter(log_format))
 
@@ -213,6 +213,7 @@ class LazyBlueprint(Blueprint):
                     deferred(fix_state)
             state.app.debug = debug
             self.deferred_functions = self.base_functions + self.deferred_functions
+            # print state, endpoint
             return self.redispatch(state, endpoint, **view_args)
 
         return inner_lazy_load
@@ -222,9 +223,11 @@ class LazyBlueprint(Blueprint):
         """
         基于flask ：0.10.1
         """
+        # print state.app.url_map
         state.app.url_map.update()
         req = _request_ctx_stack.top.request
         adapter = _request_ctx_stack.top.url_adapter
         req.url_rule, req.view_args = adapter.match(return_rule=True)
         rule = req.url_rule
+        # print rule, state.app.view_functions
         return state.app.view_functions[rule.endpoint](**req.view_args)
