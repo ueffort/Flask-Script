@@ -1,24 +1,8 @@
 # coding=utf-8
-from random import randint
-import string
 import urllib
-from flask import current_app
-from flask.ext.mail import Mail, Message
 import urllib2
-
+from flask import current_app
 __author__ = 'GaoJie'
-
-
-def send_email(title, content, to_list, cc_list=None, bcc_list=None, sender=None):
-    """
-    发送邮件
-    """
-    mail = Mail(current_app)
-    extra = {
-        "Accept-Charset": "ISO-8859-1,utf-8"
-    }
-    msg = Message(subject=title, html=content, recipients=to_list, sender=sender, cc=cc_list, bcc=bcc_list, extra_headers=extra)
-    return mail.send(msg)
 
 
 def get_url_content(url, data={}, header={}):
@@ -63,17 +47,3 @@ def post_url_content(url, data, header={}):
         current_app.logger.error('[ URL EXCEPTION ] %s', e)
         raise
     return content
-
-
-def random_str(str_len=8):
-    """
-    生成固定长度随机字符串
-    :param str_len:
-    :return:
-    """
-    s = ''
-    chars = list(string.ascii_letters + string.digits)
-    length = len(chars) - 1
-    for i in xrange(str_len):
-        s += chars[randint(0, length)]
-    return s
