@@ -27,3 +27,15 @@ class BlueprintNotExist(BaseException):
 
     def __str__(self):
         return 'Blueprint Not Initialized : %s ' % self.module_name
+
+
+class ConfigNotExist(BaseException):
+    """
+    配置不存在
+    """
+    def __init__(self, config_key, description):
+        self.config_key = config_key
+        self.description = description
+
+    def __str__(self):
+        return 'Config Not set : %s %s' % (self.config_key, self.description)

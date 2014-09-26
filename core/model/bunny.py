@@ -8,8 +8,9 @@ from flask import current_app
 
 # bind_key 用于绑定到对应的DATABASE
 #__bind_key__ = 'users'
-db = SQLAlchemy()
+db = SQLAlchemy(session_options={'autocommit': True, 'autoflush': True})
 bunny_engine = db.get_engine(current_app, 'bunny')
+
 
 class Company(db.Model):
     __tablename__ = 'b_company'
@@ -24,7 +25,7 @@ class Campaign(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
-    company = db.relationship(Company, primaryjoin=companyId == Company.id, lazy='joined')
+    company = db.relationship(Company, primaryjoin=companyId == Company.id)
 
 
 class CampaignAdgroup(db.Model):
@@ -33,7 +34,7 @@ class CampaignAdgroup(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
-    company = db.relationship(Company, primaryjoin=companyId == Company.id, lazy='joined')
+    company = db.relationship(Company, primaryjoin=companyId == Company.id)
 
 
 class CampaignCreative(db.Model):
@@ -42,9 +43,9 @@ class CampaignCreative(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
-    company = db.relationship(Company, primaryjoin=companyId == Company.id, lazy='joined')
+    company = db.relationship(Company, primaryjoin=companyId == Company.id)
     campaignId = db.Column(db.Integer, db.ForeignKey(Campaign.id))
-    campaign = db.relationship(Campaign, primaryjoin=campaignId == Campaign.id, lazy='joined')
+    campaign = db.relationship(Campaign, primaryjoin=campaignId == Campaign.id)
     #adx = db.relationship(CreativeAdx, lazy='joined')
 
     def get_format_template(self):
@@ -60,4 +61,4 @@ class CreativeAdx(db.Model):
 
     creativeId = db.Column(db.Integer, db.ForeignKey(CampaignCreative.id))
     adxId = db.Column(db.Integer)
-    creative = db.relationship(CampaignCreative, primaryjoin=creativeId == CampaignCreative.id, lazy='joined')
+    creative = db.relationship(CampaignCreative, primaryjoin=creativeId == CampaignCreative.id)

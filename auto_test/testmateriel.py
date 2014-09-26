@@ -4,7 +4,6 @@ import tempfile
 import unittest
 from auto.test_enter import *
 from core.model.bunny import *
-from common.tools import send_email
 
 __author__ = 'GaoJie'
 
