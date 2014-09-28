@@ -13,5 +13,10 @@ def send_email(title, content, to_list, cc_list=None, bcc_list=None, sender=None
     extra = {
         "Accept-Charset": "ISO-8859-1,utf-8"
     }
-    msg = Message(subject=title, html=content, recipients=to_list, sender=sender, cc=cc_list, bcc=bcc_list, extra_headers=extra)
-    return mail.send(msg)
+    try:
+        msg = Message(subject=title, html=content, recipients=to_list, sender=sender, cc=cc_list, bcc=bcc_list, extra_headers=extra)
+        mail.send(msg)
+        return True
+    except Exception as e:
+        current_app.logger.exceiption(e)
+        return False
