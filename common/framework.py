@@ -113,7 +113,7 @@ def init_app_logger(app):
     handler.setLevel(level)
     logger.addHandler(handler)
     # 添加异常日志发送email
-    if 'LOGGING_EXCEPTION_MAIL' in app.config and app.debug:
+    if 'LOGGING_EXCEPTION_MAIL' in app.config and not app.debug:
         from logging.handlers import SMTPHandler
         mail_handler = SMTPHandler(**app.config['LOGGING_EXCEPTION_MAIL'])
         # error == exception
