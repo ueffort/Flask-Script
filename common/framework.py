@@ -103,12 +103,23 @@ def init_app_logger(app):
     if type(log_level) is str:
         log_level = logging.getLevelName(log_level)
     level = logging.DEBUG if app.debug and log_level >= logging.DEBUG else log_level
+    # flask中自定义的logger过滤了非debug设置的所有日志
     logger.setLevel(logging.DEBUG)
-    log_format = app.config['LOGGING_FORMAT'] if 'LOGGING_FORMAT' in app.config else app.debug_log_format
-    handler.setFormatter(logging.Formatter(log_format))
+    log_format = logging.Formatter(app.config['LOGGING_FORMAT']
+                                   if 'LOGGING_FORMAT' in app.config else app.debug_log_format)
+
+    handler.setFormatter(log_format)
 
     handler.setLevel(level)
     logger.addHandler(handler)
+    # 添加异常日志发送email
+    if 'LOGGING_EXCEPTION_MAIL' in app.config and app.debug:
+        from logging.handlers import SMTPHandler
+        mail_handler = SMTPHandler(**app.config['LOGGING_EXCEPTION_MAIL'])
+        # error == exception
+        mail_handler.setLevel(logging.ERROR)
+        mail_handler.setFormatter(log_format)
+        logger.addHandler(mail_handler)
     return True
 
 

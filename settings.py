@@ -18,3 +18,10 @@ MAIL_DEFAULT_SENDER = 'xx<xx@xx.com>'
 
 # 日志定义
 LOGGING_FORMAT = '%(asctime)s [%(levelname)s] [%(name)s:%(lineno)s] [%(funcName)s] : %(message)s'
+LOGGING_EXCEPTION_MAIL = {
+    'mailhost': [MAIL_SERVER, MAIL_PORT],
+    'fromaddr': MAIL_DEFAULT_SENDER,
+    'toaddrs': [],
+    'subject': 'dsp-script:Exception Info Email',
+    'credentials': [MAIL_USERNAME, MAIL_PASSWORD]
+}
