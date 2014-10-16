@@ -5,6 +5,15 @@ from flask import current_app
 __author__ = 'GaoJie'
 
 
+def url_encode(url):
+    """
+    url加密
+    """
+    if isinstance(url, unicode):
+        return urllib.quote_plus(str(url))
+    return urllib.quote_plus(url)
+
+
 def get_url_content(url, data={}, header={}):
     """
     get方式获取页面信息
