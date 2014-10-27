@@ -14,10 +14,13 @@ def responsed(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        result = f(*args, **kwargs)
-        if isinstance(result, Response):
-            return result
-        else:
+        try:
+            result = f(*args, **kwargs)
+            if isinstance(result, Response):
+                return result
+        except Exception as e:
+            current_app.logger.exception(e)
+        finally:
             return current_app.response_class()
     return decorated
 
