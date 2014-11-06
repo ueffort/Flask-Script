@@ -34,7 +34,7 @@ if __name__ == '__main__':
     data_dict = {}
     for param in arg:
         mat = re.match(r'^--(.*)=(.*)', param)
-        if mat.lastindex:
+        if mat and mat.lastindex:
             data_dict[mat.group(1)] = mat.group(2)
 
     builder = EnvironBuilder(path=options.uri, method=options.method, data=data_dict)
