@@ -37,7 +37,7 @@ Flask-Script
 
 #执行
 1.在命令行执行：
-`script uri --method=get --xx=xx`
+`script.py uri --method=get --xx=xx`
 
 >> 其中`method`为框架所需，配合http协议区分脚本的执行方式，默认为`get`
 
@@ -61,3 +61,16 @@ Flask-Script
 
 * arg: -s(start dir) -p(pattern file) 
 * 测试文件都由test开头，最小测试单位为一个测试文件，如果要单独执行更细粒度的测试，则需要自己写对应的测试脚本__main__
+
+## 各目录说明
+1.common目录
+> 框架相关的文件
+> 与应用无关的工具库
+
+2.core目录：
+> 内部应用的核心，数据库或者第三方系统的访问库
+
+3.ext目录：
+> 共用逻辑处理文件
+> 响应框架通知的处理文件
+
