@@ -74,3 +74,6 @@ Flask-Script
 > 共用逻辑处理文件
 > 响应框架通知的处理文件
 
+## 开发计划
+1. 整合官方的Flask-script的功能：参数提示
+2. 抽象出manager和command对象，简化开发代码
