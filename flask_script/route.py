@@ -1,14 +1,15 @@
 # coding=utf-8
 import sys
-from common.decorators import responsed
 from flask import request
-from auto import app
-# 导入任务模块，初始化
-import auto.task
+from .decorators import responsed
+from .core import Manager
+
 __author__ = 'GaoJie'
 
+current_app = Manager.instance.get_app()
 
-@app.route('/test', methods=['post', 'get'])
+
+@current_app.route('/test', methods=['post', 'get'])
 @responsed
 def test():
     if request.method == 'post':
@@ -17,13 +18,12 @@ def test():
         print 'Get:', request.args
 
 
-@app.errorhandler(404)
+@current_app.errorhandler(404)
 @responsed
 def choose_task_404(e):
     def tips_module(package_module, package_name, module_name=None):
         try:
-            module_list = getattr(package_module, 'module_list')
-            package_list = getattr(package_module, 'package_list')
+            module_list, package_list = Manager.instance._package[package_module.__name__]
         except AttributeError as e:
             print 'No Define Module List and Package List'
             return False, []
@@ -47,35 +47,40 @@ def choose_task_404(e):
 
     def tips_action(current_module, action_name=None):
         try:
-            # 需在每个模块中添加action_list，用于判断可以执行的
-            action_list = getattr(current_module, 'action_list')
+            # 需在每个模块中添加commands，用于判断可以执行的
+            commands = Manager.instance.get_commands(current_module.__name__)
         except AttributeError as e:
             print 'No Define Action List'
             return False
+        action_list = commands.action_list
         if action_name not in action_list:
             print 'Action List: %s ' % [value for value in action_list]
             return False
+        else:
+            print 'Action %s not execute' % action_name
+            return False
 
     path_list = request.path[1:].split('/')
-    app_task = '%s.task' % __package__
-    model = 'task'
-    current_module = sys.modules[app_task]
+    root_package = Manager.instance._root_package
+    model = root_package[root_package.rfind('.') + 1:]
+    current_module = sys.modules[root_package]
     package = True
     path_list = [path for path in path_list if path]
     result = False
-
+    # print path_list
     if len(path_list) > 0:
         for index, path in enumerate(path_list):
-            app_task = '%s.%s' % (app_task, path)
+            root_package = '%s.%s' % (root_package, path)
             parent_module = current_module
             if package:
                 result, package_list = tips_module(parent_module, model, path)
             else:
+                # print path
                 result = tips_action(parent_module, path)
                 break
             if not result:
                 break
-            current_module = tips_import(app_task, model, path)
+            current_module = tips_import(root_package, model, path)
             package = True if path in package_list else False
             model = path
         if result:

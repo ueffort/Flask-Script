@@ -4,6 +4,7 @@ __author__ = 'GaoJie'
 
 
 class AppNotExist(BaseException):
+    code = 1
     """
     app不存在
     """
@@ -19,6 +20,7 @@ class AppNotExist(BaseException):
 
 
 class BlueprintNotExist(BaseException):
+    code = 1
     """
     app不存在
     """
@@ -30,6 +32,7 @@ class BlueprintNotExist(BaseException):
 
 
 class ConfigNotExist(BaseException):
+    code = 2
     """
     配置不存在
     """

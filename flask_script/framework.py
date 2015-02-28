@@ -1,20 +1,21 @@
 # coding=utf-8
-from logging import getLogger
 import logging
-import sys
-from common.exception import AppNotExist, BlueprintNotExist
-from common.ext.flask_config import FlaskConfig
-from flask import Blueprint, g, current_app, Config, _request_ctx_stack
 import flask
-from flask.helpers import get_root_path
 import re
 import os
 from settings import *
+from flask import Blueprint, _request_ctx_stack
+from flask.helpers import get_root_path
 from werkzeug.utils import cached_property, import_string
+
+from .exception import AppNotExist, BlueprintNotExist
+from .ext.flask_config import FlaskConfig
+
 
 __author__ = 'GaoJie'
 config = FlaskConfig(get_root_path(__name__))
 DEBUG = False
+
 
 
 def open_debug(b):
@@ -22,7 +23,7 @@ def open_debug(b):
     DEBUG = b
 
 
-def create_app(app_name):
+def create_app(app_name, call_back=None):
     """
     根据AppName来加载app，设定配置信息，初始化app信息
     """
@@ -31,21 +32,21 @@ def create_app(app_name):
     try:
         app_obj = __import__(app_name)
         app = getattr(app_obj, 'app')
-    except (AttributeError) as e:
+    except AttributeError as e:
         raise AppNotExist(app_name)
-    return app
+    return call_back(app) if call_back else app
 
 
 def enter_app_context(app_name):
     """
-        根据AppName来加载app，设定配置信息，初始化app信息,返回一个app环境
-        """
+    根据AppName来加载app，设定配置信息，初始化app信息,返回一个app环境
+    """
     if app_name not in ALLOW_APP:
         raise AppNotExist(app_name, allow=False)
     try:
         app_obj = __import__(app_name)
         app = getattr(app_obj, 'app')
-    except (AttributeError) as e:
+    except AttributeError as e:
         raise AppNotExist(app_name)
     return app.app_context()
 
@@ -60,6 +61,16 @@ def init_config():
     except IOError as e:
         # 导入本地配置
         config.from_pyfile('../local_settings.py')
+
+
+def init_app(app):
+    """
+    初始化应用
+    :return:
+    """
+    init_app_config(app)
+    init_app_logger(app)
+    return app
 
 
 def init_app_config(app):
@@ -123,6 +134,7 @@ def init_app_logger(app):
     return True
 
 
+
 def get_module_package(path):
     """
     获取路径下所有模块名
@@ -140,22 +152,22 @@ def get_module_package(path):
     return module_list, package_list
 
 
-def blueprint_module(module_list, package_full, father_url=None, need_lazy=True):
+def blueprint_module(module_list, package_full, father_prefix=None, need_lazy=True):
     """
     根据模块列表注册蓝图
     """
     blueprint_map = {}
-    if not father_url:
-        father_url = '/'
+    if not father_prefix:
+        father_prefix = '/'
     else:
-        father_url = '%s%s/' % (father_url, package_full.split('.')[-1])
+        father_prefix = '%s%s/' % (father_prefix, package_full.split('.')[-1])
     func = LazyBlueprint if need_lazy else Blueprint
     if module_list:
         for module_name in module_list:
             blueprint_map[module_name] = func('%s.%s' % (package_full, module_name),
                                               '%s.%s' % (package_full, module_name),
-                                              url_prefix='%s%s' % (father_url, module_name))
-    return blueprint_map, father_url
+                                              url_prefix='%s%s' % (father_prefix, module_name))
+    return blueprint_map, father_prefix
 
 
 def get_module_blueprint(blueprint_map, module_name):
@@ -169,7 +181,6 @@ def get_module_blueprint(blueprint_map, module_name):
     if module_name not in blueprint_map:
         raise BlueprintNotExist(module_name)
     return blueprint_map[module_name]
-
 
 def get_current_logger(app, module_full):
     return app.logger.getChild(module_full[len(app.import_name) + 1:])

@@ -1,5 +1,5 @@
 from unittest import TestLoader
-from common.framework import enter_app_context
+from flask.ext.script.framework import enter_app_context
 from settings import ALLOW_APP
 
 __author__ = 'GaoJie'
