@@ -1,6 +1,5 @@
 # coding=utf-8
 import json
-from ext.logic import CompanyExt
 from core.model import db, bunny_engine as engine
 
 __author__ = 'GaoJie'
@@ -72,6 +71,8 @@ class CampaignCreative(db.Model):
             file_source = template['adObject']['icon_url']
         else:
             return False
+        # 加载logic文件需动态加载
+        from ext.logic import CompanyExt
         return CompanyExt.attach_url(file_source, self.companyId)
 
 

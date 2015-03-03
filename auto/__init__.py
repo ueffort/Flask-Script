@@ -2,15 +2,14 @@
 """
 自动化脚本应用
 """
-from common.framework import init_app_config, init_app_logger
 from flask import Flask
+from flask.ext.script import manager
 from flask.ext.sqlalchemy import SQLAlchemy
 
 __author__ = 'GaoJie'
 
 app = Flask(__name__)
-init_app_config(app)
-init_app_logger(app)
+manager.init_app(app, 'task')
 db = SQLAlchemy(app)
 logger = app.logger
 

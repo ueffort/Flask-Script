@@ -2,18 +2,12 @@
 """
 adgroup的脚本任务
 """
-from auto.decorators import action
-from common.decorators import responsed
-from common.framework import get_module_blueprint
-from auto.task import blueprint_list
+from flask.ext.script import manager
 
 __author__ = 'GaoJie'
-instance = get_module_blueprint(blueprint_list, __name__)
-action_list = []
+commands = manager.get_commands(__name__)
+logger = commands.get_logger()
 
-
-@action(action_list)
-@instance.route('/cache')
-@responsed
+@commands.command
 def cache():
     print 1

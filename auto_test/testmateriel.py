@@ -2,7 +2,7 @@
 import os
 import tempfile
 import unittest
-from auto.test_enter import *
+from auto_test import *
 from core.model.bunny import *
 
 __author__ = 'GaoJie'

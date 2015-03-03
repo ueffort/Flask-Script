@@ -1,5 +1,5 @@
 # coding=utf-8
-from common.exception import ConfigNotExist
+from flask.ext.script.exception import ConfigNotExist
 from flask import current_app
 import redis
 
