@@ -13,7 +13,7 @@ Flask-Script
 3.安装所需类库
 ### 安装脚本 ###
 * Linux下：`./install.sh`
-* Windows下：`./install.bat` 
+* Windows下：`./install.bat`
 
 ### 手动安装：###
 * Linux下：`./env/bin/pip install xxx`
@@ -31,15 +31,13 @@ Flask-Script
 
 #配置
 * `settings`为通用配置，和执行环境无关的配置设置
-* 复制`production_settings_template.py`为`production_settings.py`，并修改对应的配置信息 
+* 复制`production_settings_template.py`为`production_settings.py`，并修改对应的配置信息
 * 需要保证`local_settings.py`和`production_settings_template.py`的配置项一致
 * 以`APP_name`为开头的`%s_CONFIG`为应用的单独配置，可以用于划分数据库等，如果在`settings`中已经存在，则需要手动进行合并
 
 #执行
 1.在命令行执行：
-`script.py uri --method=get --xx=xx`
-
->> 其中`method`为框架所需，配合http协议区分脚本的执行方式，默认为`get`
+`script.py uri --xx=xx`
 
 >> --开头的作为参数传入
 
@@ -59,13 +57,12 @@ Flask-Script
 
 > `python script.py auto_test discover arg `
 
-* arg: -s(start dir) -p(pattern file) 
+* arg: -s(start dir) -p(pattern file)
 * 测试文件都由test开头，最小测试单位为一个测试文件，如果要单独执行更细粒度的测试，则需要自己写对应的测试脚本__main__
 
 ## 各目录说明
-1.common目录
+1.flask_script目录
 > 框架相关的文件
-> 与应用无关的工具库
 
 2.core目录：
 > 内部应用的核心，数据库或者第三方系统的访问库
@@ -73,6 +70,7 @@ Flask-Script
 3.ext目录：
 > 共用逻辑处理文件
 > 响应框架通知的处理文件
+> 与应用无关的工具库
 
 ## 开发计划
 1. 整合官方的Flask-script的功能：参数提示
