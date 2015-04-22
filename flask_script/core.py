@@ -189,11 +189,10 @@ class Manager(object):
 
 
 class Commands(object):
-    action_list = []
-
     def __init__(self, blueprint, module_name=None):
         self._blueprint = blueprint
         self._module_name = module_name
+        self.action_list = []
 
     def route(self, *args, **kwargs):
         action_list = self.action_list
