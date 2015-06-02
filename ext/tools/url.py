@@ -28,11 +28,11 @@ def get_url_content(url, data={}, header={}):
     """
     get方式获取页面信息
     """
-    if url.find('?') >= 0:
-        url += '&'
-    else:
-        url += '?'
     if data:
+        if url.find('?') >= 0:
+            url += '&'
+        else:
+            url += '?'
         url += urllib.urlencode(data)
     try:
         current_app.logger.debug('[ URL REQUEST ] %s', url)
