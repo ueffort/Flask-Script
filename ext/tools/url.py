@@ -59,6 +59,7 @@ def post_url_content(url, data, header={}):
             current_app.logger.debug('[ URL DATA ] %s', data)
             if isinstance(data, dict):
                 data = urllib.urlencode(data)
+                current_app.logger.debug('[ URL DATA URL ] %s', data)
         request = urllib2.Request(url, data=data, headers=header)
         content = urllib2.urlopen(request).read()
         current_app.logger.debug('[ URL RESPONSE ] %s', content)
