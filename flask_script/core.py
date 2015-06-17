@@ -210,15 +210,7 @@ class Commands(object):
         :param f:
         :return:
         """
-        return self.route('/' + f.__name__)(f)
-
-    def option(self):
-        """
-        修饰符
-        :return:
-        """
-        # todo 为命令添加参数
-        pass
+        return Command(self).generate(f)
 
     def get_logger(self):
         return Manager.get_logger(self._module_name)
@@ -228,6 +220,23 @@ class Commands(object):
 class Command(object):
     des = None
 
-    def __init__(self):
+    def __init__(self, commands):
+        self.commands = commands
+
+    def generate(self, f):
+        return self.commands.route('/' + f.__name__)(f)
+
+    def require(self, f):
+        """
+        修饰符:添加必选参数
+        :return:
+        """
         pass
 
+    def option(self, f):
+        """
+        修饰符:添加可选参数，无顺序
+        :return:
+        """
+        # todo 为命令添加参数
+        pass
