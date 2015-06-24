@@ -40,6 +40,7 @@ Flask-Script
 `script.py uri --xx=xx`
 
 >> --开头的作为参数传入
+>> 根据申明函数所需参数判断，验证必选参数并提示
 
 #内部说明
 ## auto应用
@@ -73,5 +74,5 @@ Flask-Script
 > 与应用无关的工具库
 
 ## 开发计划
-1. 整合官方的Flask-script的功能：参数提示
-2. 抽象出manager和command对象，简化开发代码
+1. 交互式命令行操作
+2. 优化manager，增强单应用及多应用操作的切换
