@@ -1,5 +1,6 @@
 # coding=utf-8
 import argparse
+import inspect
 from urllib import quote_plus
 import sys
 from flask import request, current_app, Blueprint
@@ -26,24 +27,26 @@ class Manager(object):
         self._namespace = {}
         self._package = {}
         self._commands_package = {}
+        self.options = None
 
     def _handle(self, parser):
         parser.add_argument("command", type=str, help="See ReadMe")
         parser.add_argument("-d", action='store_true', default=False, help="Open Debug")
         parser.add_argument("-s", action='store_true', default=False, help="Single Model")
+        parser.add_argument("-i", action='store_true', default=False, help="Show Command info")
 
-        options, arg = parser.parse_known_args()
+        self.options, arg = parser.parse_known_args()
 
         # 是否开启DEBUG模式，会忽略配置中的DEBUG，用于线上调试
-        if options.d:
+        if self.options.d:
             open_debug(True)
 
         # 减少并发，单模式
         # 如果发现之前的还在执行则停止当前
         basedir = os.path.dirname('./tmp/')
-        file_name = '%s/%s' % (basedir, options.command.replace('/', '.'))
+        file_name = '%s/%s' % (basedir, self.options.command.replace('/', '.'))
 
-        if options.s:
+        if self.options.s:
             if os.path.isfile(file_name):
                 print 'Process is running'
                 exit()
@@ -63,14 +66,14 @@ class Manager(object):
                 pass
 
         application = PathDispatcher(create_app=create_app)
-        builder = EnvironBuilder(path=options.command, method='get')
+        builder = EnvironBuilder(path=self.options.command, method='get')
 
         builder.query_string = '&'.join(
             ["%s=%s" % (quote_plus(key), quote_plus(value)) for key, value in param_dict.items()])
 
         try:
             run_wsgi_app(application, builder.get_environ())
-            if options.s:
+            if self.options.s:
                 os.remove(file_name)
         except AppNotExist as e:
             return e.code
@@ -158,7 +161,7 @@ class Manager(object):
         if module_name not in self._commands:
             father_module_name = module_name[:module_name.rfind('.')]
             instance = get_module_blueprint(self._commands_package[father_module_name], module_name)
-            self._commands[module_name] = Commands(instance)
+            self._commands[module_name] = Commands(instance, self)
         return self._commands[module_name]
 
     def add_commands(self, module_name):
@@ -189,17 +192,18 @@ class Manager(object):
 
 
 class Commands(object):
-    def __init__(self, blueprint, module_name=None):
+    def __init__(self, blueprint, manager, module_name=None):
         self._blueprint = blueprint
         self._module_name = module_name
         self.action_list = []
+        self.manager = manager
 
     def route(self, *args, **kwargs):
         action_list = self.action_list
         blueprint = self._blueprint
 
         def decorator(f):
-            action_list.append(f.__name__)
+            action_list.append(kwargs.get("endpoint", f.__name__))
             return blueprint.route(*args, **kwargs)(responsed(f))
 
         return decorator
@@ -215,28 +219,77 @@ class Commands(object):
     def get_logger(self):
         return Manager.get_logger(self._module_name)
 
+    def description(self):
+        # todo 处理commands的描述信息
+        return self
 
-# todo 抽象command对象，建立和manager对象关系
+
 class Command(object):
-    des = None
 
     def __init__(self, commands):
         self.commands = commands
 
     def generate(self, f):
-        return self.commands.route('/' + f.__name__)(f)
+        def proxy(*args, **kwargs):
+            param = Param(f)
+            if self.commands.manager.options.i:  # 输出help信息
+                return param.help()
 
-    def require(self, f):
+            return f(*param.args, **param.kwargs) if param.is_ok() else param.error()
+
+        return self.commands.route('/' + f.__name__, endpoint=f.__name__)(proxy)
+
+
+class Param():
+    def __init__(self, f):
+        self.f = f
+        self.required = []
+        self.option = []
+        self.args = []
+        self.kwargs = {}
+        self.parse()
+
+    def parse(self):
+        arg = inspect.getargspec(self.f)
+        if arg.defaults:
+            self.required = arg.args[0:-len(arg.defaults)]
+            self.option = arg.args[len(self.required):]
+        else:
+            self.required = arg.args
+
+    def is_ok(self):
         """
-        修饰符:添加必选参数
+        所有必选参数都需要被设置
         :return:
         """
-        pass
+        if not self.required:
+            return True
+        for p in self.required:
+            a = Manager.get_param(p)
+            if a is None:
+                return False
+            self.args.append(a)
+        if not self.option:
+            return True
+        for p in self.option:
+            a = Manager.get_param(p)
+            if a is None:
+                continue
+            self.kwargs[p] = a
+        return True
 
-    def option(self, f):
+    def error(self):
+        if self.required:
+            print 'Command need required param: %s' % ','.join(self.required)
+        if self.option:
+            print '              options param: %s' % ','.join(self.option)
+        self.help()
+
+    def help(self):
         """
-        修饰符:添加可选参数，无顺序
+        直接输出command的说明，后续优化
         :return:
         """
-        # todo 为命令添加参数
-        pass
+        import locale
+        import codecs
+        print self.f.__doc__.decode('utf-8').encode(codecs.lookup(locale.getpreferredencoding()).name)
