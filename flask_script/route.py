@@ -45,19 +45,19 @@ def choose_task_404(e):
         print '%s: %s ' % (model_name.capitalize(), action_name)
         return sys.modules[current_module_full]
 
-    def tips_action(current_module, action_name=None):
+    def tips_command(current_module, command_name=None):
         try:
             # 需在每个模块中添加commands，用于判断可以执行的
             commands = Manager.instance.get_commands(current_module.__name__)
         except AttributeError as e:
             print 'No Define Action List'
             return False
-        action_list = commands.action_list
-        if action_name not in action_list:
-            print 'Action List: %s ' % [value for value in action_list]
+        command_list = commands.command_list
+        if command_name not in command_list:
+            print 'Command List: %s ' % [value for value in command_list]
             return False
         else:
-            print 'Action %s not execute' % action_name
+            print 'Command %s not execute' % command_name
             return False
 
     path_list = request.path[1:].split('/')
@@ -76,7 +76,7 @@ def choose_task_404(e):
                 result, package_list = tips_module(parent_module, model, path)
             else:
                 # print path
-                result = tips_action(parent_module, path)
+                result = tips_command(parent_module, path)
                 break
             if not result:
                 break
@@ -87,7 +87,7 @@ def choose_task_404(e):
             if package:
                 tips_module(current_module, model)
             else:
-                tips_action(current_module)
+                tips_command(current_module)
     else:
         tips_module(current_module, model)
 

@@ -195,15 +195,15 @@ class Commands(object):
     def __init__(self, blueprint, manager, module_name=None):
         self._blueprint = blueprint
         self._module_name = module_name
-        self.action_list = []
+        self.command_list = []
         self.manager = manager
 
     def route(self, *args, **kwargs):
-        action_list = self.action_list
+        command_list = self.command_list
         blueprint = self._blueprint
 
         def decorator(f):
-            action_list.append(kwargs.get("endpoint", f.__name__))
+            command_list.append(kwargs.get("endpoint", f.__name__))
             return blueprint.route(*args, **kwargs)(responsed(f))
 
         return decorator
@@ -244,7 +244,7 @@ class Param():
     def __init__(self, f):
         self.f = f
         self.required = []
-        self.option = []
+        self.option = {}
         self.args = []
         self.kwargs = {}
         self.parse()
@@ -253,7 +253,9 @@ class Param():
         arg = inspect.getargspec(self.f)
         if arg.defaults:
             self.required = arg.args[0:-len(arg.defaults)]
-            self.option = arg.args[len(self.required):]
+            l = len(self.required)
+            for i in xrange(0, len(arg.defaults)):
+                self.option[arg.args[l + i]] = arg.defaults[i]
         else:
             self.required = arg.args
 
@@ -271,7 +273,7 @@ class Param():
             self.args.append(a)
         if not self.option:
             return True
-        for p in self.option:
+        for p, v in self.option.iteritems():
             a = Manager.get_param(p)
             if a is None:
                 continue
@@ -282,7 +284,7 @@ class Param():
         if self.required:
             print 'Command need required param: %s' % ','.join(self.required)
         if self.option:
-            print '              options param: %s' % ','.join(self.option)
+            print '              options param: %s' % ','.join(['%s(%s)' % (k, v) for k, v in self.option.iteritems()])
         self.help()
 
     def help(self):
