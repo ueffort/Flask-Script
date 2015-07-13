@@ -1,23 +1,27 @@
 # coding=utf-8
 import json
-from core.model import db, bunny_engine as engine
+
+from core.model import db
+from flask import current_app
+
 
 __author__ = 'GaoJie'
 
+bunny_engine = db.get_engine(current_app, 'bunny')
 # bind_key 用于绑定到对应的DATABASE
 #__bind_key__ = 'users'
 
 
 class Company(db.Model):
     __tablename__ = 'b_company'
-    __table_args__ = {'autoload': True, 'autoload_with': engine}
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
 
     id = db.Column(db.Integer, primary_key=True)
 
 
 class Campaign(db.Model):
     __tablename__ = 'b_campaign'
-    __table_args__ = {'autoload': True, 'autoload_with': engine}
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
@@ -26,7 +30,7 @@ class Campaign(db.Model):
 
 class CampaignAdgroup(db.Model):
     __tablename__ = 'b_campaign_adgroup'
-    __table_args__ = {'autoload': True, 'autoload_with': engine}
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
@@ -37,7 +41,7 @@ class CampaignAdgroup(db.Model):
 
 class CampaignCreative(db.Model):
     __tablename__ = 'b_campaign_creative'
-    __table_args__ = {'autoload': True, 'autoload_with': engine}
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
 
     id = db.Column(db.Integer, primary_key=True)
     companyId = db.Column(db.Integer, db.ForeignKey(Company.id))
@@ -72,14 +76,30 @@ class CampaignCreative(db.Model):
         else:
             return False
         # 加载logic文件需动态加载
-        from ext.logic import CompanyExt
+        from frontend.logic import CompanyExt
         return CompanyExt.attach_url(file_source, self.companyId)
 
 
 class CreativeAdx(db.Model):
     __tablename__ = 'b_creative_adx'
-    __table_args__ = {'autoload': True, 'autoload_with': engine}
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
 
     creativeId = db.Column(db.Integer, db.ForeignKey(CampaignCreative.id))
     adxId = db.Column(db.Integer)
     creative = db.relationship(CampaignCreative, primaryjoin=creativeId == CampaignCreative.id)
+
+
+class Cert(db.Model):
+    __tablename__ = 'b_org_cert'
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
+
+    id = db.Column(db.Integer, primary_key=True)
+
+
+class CertAudit(db.Model):
+    __tablename__ = 'b_org_cert_audit'
+    __table_args__ = {'autoload': True, 'autoload_with': bunny_engine}
+
+    certId = db.Column(db.Integer, db.ForeignKey(Cert.id))
+    adxId = db.Column(db.Integer)
+    creative = db.relationship(Cert, primaryjoin=certId == Cert.id)
