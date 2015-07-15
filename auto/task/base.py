@@ -1,11 +1,11 @@
 # coding=utf-8
 """
-基本任务
+frontend的基本任务
 """
 from smtplib import SMTPRecipientsRefused
 from ext.tools.mail import send_email
-from core.model import bunny_engine
-from flask import request
+from core.model.bunny import bunny_engine
+from flask import request, render_template
 from flask.ext.script import manager
 from sqlalchemy import text
 
@@ -16,6 +16,10 @@ logger = commands.get_logger()
 
 @commands.command
 def send_mail():
+    """
+    发送dsp通知邮件
+    :return:
+    """
     mail_list = get_mail_list()
     for m in mail_list:
         try:
@@ -35,14 +39,24 @@ def send_mail():
 
 
 @commands.command
-def send_mail_simple():
+def send_mail_simple(subject, body, to):
+    """
+    发送邮件
+    :param subject: 邮件标题
+    :param body: 邮件内容
+    :param to: 接收方
+    """
     try:
-        send_email(request.args.get('subject'), request.args.get('body'), [request.args.get('to')])
+        body = render_template('email/base.html', **{
+            "title": subject,
+            "body": body
+        })
+        send_email(manager.get_param('subject'), body, [to])
     except SMTPRecipientsRefused as e:
         logger.exception(e)
         return
     else:
-        logger.info("[ MAIL ] %s send mail Success")
+        logger.info("[ MAIL ] %s send mail Success", to)
         return
 
 

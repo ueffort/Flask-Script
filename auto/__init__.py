@@ -10,7 +10,6 @@ __author__ = 'GaoJie'
 
 app = Flask(__name__)
 manager.init_app(app, 'task')
-db = SQLAlchemy(app)
+# 自定义的应用配置信息
+db = SQLAlchemy(app, session_options={'autocommit': True, 'autoflush': True})
 logger = app.logger
-
-from auto import route
