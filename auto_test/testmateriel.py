@@ -1,22 +1,40 @@
 # coding=utf-8
-import os
-import tempfile
 import unittest
-from auto_test import *
-from core.model.bunny import *
+
+from . import *
+from flask.ext.script import manager
+
 
 __author__ = 'GaoJie'
 
 
 class MaterielTestCase(unittest.TestCase):
-    def setUp(self):
-        pass
+    """
+    不能在调用route的页面测试，需分开测试route中的函数
+    """
+    def test_iqiyi(self):
+        """
+        测试iqiyi
+        :return:
+        """
+        client = app.test_client()
+        client.get('/materiel/iqiyi/status')
+        client.get('/materiel/iqiyi/status_one/18113')
 
-    def tearDown(self):
-        pass
+    def test_youku(self):
+        """
+        测试iqiyi
+        :return:
+        """
+        client = app.test_client()
+        client.get('/materiel/youku/status')
+        client.get('/materiel/youku/status_one/18055')
 
-    def test_empty_db(self):
-        creative_list = CampaignCreative.query.join(CreativeAdx) \
-            .filter(CreativeAdx.status == 4).filter(CampaignCreative.creativeType == 3).all()
-        #rv = self.app.get('/materiel/youku/upload')
-        #assert 'No entries here so far' in rv.data
+    def test_doubleclick(self):
+        """
+        测试doubleclick
+        :return:
+        """
+        client = app.test_client()
+        client.get('/materiel/doubleclick/status')
+        client.get('/materiel/doubleclick/status_one/18055')
