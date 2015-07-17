@@ -17,7 +17,6 @@ config = FlaskConfig(get_root_path(__name__))
 DEBUG = False
 
 
-
 def open_debug(b):
     global DEBUG
     DEBUG = b
@@ -109,11 +108,17 @@ def init_app_logger(app):
     module = __import__('.'.join(logging_handler[:-1]))
     handler_class = getattr(module, ''.join(logging_handler[-1]))
     arg = app.config['LOGGING_HANDLER_ARG'] if 'LOGGING_HANDLER_ARG' in app.config else {}
-    handler = handler_class(*arg)
     log_level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else logging.INFO
     if type(log_level) is str:
         log_level = logging.getLevelName(log_level)
     level = logging.DEBUG if app.debug and log_level >= logging.DEBUG else log_level
+
+    # 支持代码中切换debug模式
+    class DebugHandler(handler_class):
+        def emit(self, record):
+            handler_class.emit(self, record) if app.debug or level <= record.levelno else None
+    handler = DebugHandler(*arg)
+
     # flask中自定义的logger过滤了非debug设置的所有日志
     logger.setLevel(logging.DEBUG)
     log_format = logging.Formatter(app.config['LOGGING_FORMAT']
@@ -121,7 +126,7 @@ def init_app_logger(app):
 
     handler.setFormatter(log_format)
 
-    handler.setLevel(level)
+    handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     # 添加异常日志发送email
     if 'LOGGING_EXCEPTION_MAIL' in app.config and not app.debug:
@@ -132,7 +137,6 @@ def init_app_logger(app):
         mail_handler.setFormatter(log_format)
         logger.addHandler(mail_handler)
     return True
-
 
 
 def get_module_package(path):
@@ -181,6 +185,7 @@ def get_module_blueprint(blueprint_map, module_name):
     if module_name not in blueprint_map:
         raise BlueprintNotExist(module_name)
     return blueprint_map[module_name]
+
 
 def get_current_logger(app, module_full):
     return app.logger.getChild(module_full[len(app.import_name) + 1:])
