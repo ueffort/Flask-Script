@@ -13,6 +13,7 @@ from .exception import AppNotExist, BlueprintNotExist
 from .dispatcher import PathDispatcher
 from .framework import init_app, open_debug, create_app, get_current_logger, LazyBlueprint, get_module_package, \
     blueprint_module, get_module_blueprint
+from .cli import prompt
 
 __author__ = 'GaoJie'
 
@@ -54,15 +55,14 @@ class Manager(object):
                 os.makedirs(basedir)
             with file(file_name, 'w'):
                 os.utime(file_name, None)
-        # todo 更改
+
         param_dict = {}
         for param in arg:
             mat = re.match(r'^--(.*)=(.*)', param)
             if mat and mat.lastindex:
-                # 作为可选参数，通过manager.get_param()获取
+                # 作为参数，通过manager.get_param()获取
                 param_dict[mat.group(1)] = mat.group(2)
             else:
-                # todo 优化参数为函数参数
                 pass
 
         application = PathDispatcher(create_app=create_app)
@@ -187,7 +187,7 @@ class Manager(object):
         return request.args.get(key)
 
     @staticmethod
-    def get_logger(module_name):
+    def get_logger(module_name=None):
         return get_current_logger(current_app, module_name) if module_name else current_app.logger
 
 
@@ -195,6 +195,7 @@ class Commands(object):
     def __init__(self, blueprint, manager, module_name=None):
         self._blueprint = blueprint
         self._module_name = module_name
+        self._interaction = None
         self.command_list = []
         self.manager = manager
 
@@ -218,6 +219,15 @@ class Commands(object):
 
     def get_logger(self):
         return Manager.get_logger(self._module_name)
+
+    def interaction(self):
+        """
+        获取交互对象
+        :return: Interaction
+        """
+        if not self._interaction:
+            self._interaction = Interaction(self)
+        return self._interaction
 
     def description(self):
         # todo 处理commands的描述信息
@@ -295,3 +305,13 @@ class Param():
         import locale
         import codecs
         print self.f.__doc__.decode('utf-8').encode(codecs.lookup(locale.getpreferredencoding()).name)
+
+
+class Interaction():
+    def __init__(self, father):
+        self.logger = father.get_logger()
+
+    def ask(self, name, default=None):
+        reply = prompt(name, default)
+        self.logger.debug('[ IA ] %s: %s', name, reply)
+        return reply
