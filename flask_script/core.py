@@ -274,8 +274,6 @@ class Param():
         所有必选参数都需要被设置
         :return:
         """
-        if not self.required:
-            return True
         for p in self.required:
             a = Manager.get_param(p)
             if a is None:
