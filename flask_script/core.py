@@ -13,7 +13,7 @@ from .exception import AppNotExist, BlueprintNotExist
 from .dispatcher import PathDispatcher
 from .framework import init_app, open_debug, create_app, get_current_logger, LazyBlueprint, get_module_package, \
     blueprint_module, get_module_blueprint
-from .cli import prompt
+from .cli import prompt, prompt_pass, prompt_choices, prompt_bool
 
 __author__ = 'GaoJie'
 
@@ -311,5 +311,20 @@ class Interaction():
 
     def ask(self, name, default=None):
         reply = prompt(name, default)
-        self.logger.debug('[ IA ] %s: %s', name, reply)
+        self.logger.debug('[ IA ] ask %s: %s', name, reply)
+        return reply
+
+    def password(self, name, default=None):
+        reply = prompt_pass(name, default)
+        self.logger.debug('[ IA ] password %s: %s', name, reply)
+        return reply
+
+    def choices(self, name, choices, default=None):
+        reply = prompt_choices(name, choices, default)
+        self.logger.debug('[ IA ] choices %s: %s', name, reply)
+        return reply
+
+    def bool(self, name, default=False):
+        reply = prompt_bool(name, default)
+        self.logger.debug('[ IA ] bool %s: %s', name, reply)
         return reply
