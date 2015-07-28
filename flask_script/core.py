@@ -178,13 +178,13 @@ class Manager(object):
         pass
 
     @staticmethod
-    def get_param(key):
+    def get_param(key, default=None):
         """
         获取命令行参数
         :param key:
         :return:
         """
-        return request.args.get(key)
+        return request.args.get(key, default=default)
 
     @staticmethod
     def get_logger(module_name=None):
@@ -215,7 +215,7 @@ class Commands(object):
         :param f:
         :return:
         """
-        return Command(self).generate(f)
+        return Command(self, f)
 
     def get_logger(self):
         return Manager.get_logger(self._module_name)
@@ -236,27 +236,47 @@ class Commands(object):
 
 class Command(object):
 
-    def __init__(self, commands):
+    def __init__(self, commands, f):
         self.commands = commands
+        self.param = {}
+        self._generate(f)
 
-    def generate(self, f):
+    def _generate(self, f):
+
         def proxy(*args, **kwargs):
-            param = Param(f)
+            param = Param(f, self)
             if self.commands.manager.options.i:  # 输出help信息
                 return param.help()
 
             return f(*param.args, **param.kwargs) if param.is_ok() else param.error()
 
-        return self.commands.route('/' + f.__name__, endpoint=f.__name__)(proxy)
+        self.commands.route('/' + f.__name__, endpoint=f.__name__)(proxy)
+        return self
+
+    def interaction(self):
+        return self.commands.interaction()
+
+    def __setitem__(self, item, value):
+        self.param[item] = value
+
+    def __getitem__(self, item):
+        return self.param[item]
+
+    def get(self, key, default=None):
+        if key in self.param:
+            return self.param[key]
+        else:
+            return Manager.get_param(key, default)
 
 
 class Param():
-    def __init__(self, f):
+    def __init__(self, f, param):
         self.f = f
         self.required = []
         self.option = {}
         self.args = []
         self.kwargs = {}
+        self.param = param
         self.parse()
 
     def parse(self):
@@ -275,14 +295,14 @@ class Param():
         :return:
         """
         for p in self.required:
-            a = Manager.get_param(p)
+            a = self.param.get(p)
             if a is None:
                 return False
             self.args.append(a)
         if not self.option:
             return True
         for p, v in self.option.iteritems():
-            a = Manager.get_param(p)
+            a = self.param.get(p)
             if a is None:
                 continue
             self.kwargs[p] = a
@@ -324,7 +344,7 @@ class Interaction():
         self.logger.debug('[ IA ] choices %s: %s', name, reply)
         return reply
 
-    def bool(self, name, default=False):
+    def confirm(self, name, default=False):
         reply = prompt_bool(name, default)
         self.logger.debug('[ IA ] bool %s: %s', name, reply)
         return reply
