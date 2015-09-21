@@ -42,6 +42,16 @@ class Manager(object):
         if self.options.d:
             open_debug(True)
 
+        # 单元测试模式
+        app = self.options.command.split('/')[0]
+        if app in TEST_MODULE:
+            argv = sys.argv
+            argv.pop(1)
+            # if len(argv) == 1:
+            #     argv.append('discover')
+            unittest.main(module=self.options.command.replace('/', '.'), argv=argv)
+            exit()
+
         # 减少并发，单模式
         # 如果发现之前的还在执行则停止当前
         basedir = os.path.dirname('./tmp/')
