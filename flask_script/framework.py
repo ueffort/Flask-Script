@@ -26,8 +26,13 @@ def create_app(app_name, call_back=None):
     """
     根据AppName来加载app，设定配置信息，初始化app信息
     """
+    init_config()
     if app_name not in ALLOW_APP:
         raise AppNotExist(app_name, allow=False)
+    else:
+        app_config = ALLOW_APP[app_name]
+        if isinstance(app_config, list) and getattr(config.last_obj, 'ENV') not in app_config:
+            raise AppNotExist(app_name, allow=False)
     try:
         app_obj = __import__(app_name)
         app = getattr(app_obj, 'app')
@@ -76,7 +81,6 @@ def init_app_config(app):
     """
     初始化应用配置：对配置信息进行应用划分
     """
-    init_config()
     app.config.from_object(config.last_obj)
     if DEBUG:
         app.debug = DEBUG

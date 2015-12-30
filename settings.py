@@ -4,7 +4,10 @@
 """
 
 # 允许访问的APP
-ALLOW_APP = ['auto']
+ALLOW_APP = {
+    'auto': True,
+    'test'; ['local']
+}
 
 # 测试的模块
 TEST_MODULE = ['auto_test']
