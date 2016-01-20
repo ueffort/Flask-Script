@@ -81,6 +81,7 @@ def init_app_config(app):
     """
     初始化应用配置：对配置信息进行应用划分
     """
+    init_config()
     app.config.from_object(config.last_obj)
     if DEBUG:
         app.debug = DEBUG
