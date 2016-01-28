@@ -1,11 +1,13 @@
 # coding=utf-8
 import argparse
 import inspect
+import unittest
 from urllib import quote_plus
 import sys
 from flask import request, current_app, Blueprint
 import re
 import os
+from settings import TEST_MODULE
 from werkzeug.test import EnvironBuilder, run_wsgi_app
 
 from .decorators import responsed
@@ -332,7 +334,10 @@ class Param():
         """
         import locale
         import codecs
-        print self.f.__doc__.decode('utf-8').encode(codecs.lookup(locale.getpreferredencoding()).name)
+        try:
+            print self.f.__doc__.decode('utf-8').encode(codecs.lookup(locale.getpreferredencoding()).name)
+        except Exception as e:
+            print self.f.__doc__
 
 
 class Interaction():
