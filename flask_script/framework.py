@@ -85,14 +85,19 @@ def init_app_config(app):
     app.config.from_object(config.last_obj)
     if DEBUG:
         app.debug = DEBUG
-    config_name = '%s_CONFIG' % app.import_name.upper()
-    if config_name not in app.config:
-        return False
-    app_config = app.config[config_name]
-    if type(app_config) not in [dict, tuple]:
-        return False
-    for key, value in app_config.items():
-        app.config[key] = value
+    
+    def replace_config(config_key):
+        if config_key not in app.config:
+            return False
+        app_config = app.config[config_key]
+        if type(app_config) not in [dict, tuple]:
+            return False
+        for key, value in app_config.iteritems():
+            app.config[key] = value
+
+    replace_config('%s_CONFIG' % app.import_name.upper())
+    replace_config('ENV_%s' % app.config['ENV'].upper())
+
     if DEBUG:
         app.debug = DEBUG
     return True
