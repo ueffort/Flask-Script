@@ -31,6 +31,7 @@ class Manager(object):
         self._package = {}
         self._commands_package = {}
         self.options = None
+        self.command_init = False
 
     def _handle(self, parser):
         parser.add_argument("command", type=str, help="See ReadMe")
@@ -227,7 +228,7 @@ class Commands(object):
         :param f:
         :return:
         """
-        return Command(self, f)
+        return Command(self).generate(f)
 
     def get_logger(self):
         return Manager.get_logger(self._module_name)
@@ -248,22 +249,21 @@ class Commands(object):
 
 class Command(object):
 
-    def __init__(self, commands, f):
+    def __init__(self, commands):
         self.commands = commands
         self.param = {}
-        self._generate(f)
 
-    def _generate(self, f):
+    def generate(self, f):
 
         def proxy(*args, **kwargs):
             param = Param(f, self)
             if self.commands.manager.options.i:  # 输出help信息
                 return param.help()
-
+            self.commands.manager.command_init = True
             return f(*param.args, **param.kwargs) if param.is_ok() else param.error()
 
         self.commands.route('/' + f.__name__, endpoint=f.__name__)(proxy)
-        return self
+        return f
 
     def interaction(self):
         return self.commands.interaction()
